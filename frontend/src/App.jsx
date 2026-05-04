@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import { Navbar, Nav, Container, Button, Offcanvas } from 'react-bootstrap';
-import { List, House, Person, BoxArrowRight, PersonPlus } from 'react-bootstrap-icons';
+import { List, House, Person, BoxArrowRight, PersonPlus, Grid } from 'react-bootstrap-icons';
 import LogoTYM from './assets/logoTym';
 
 // Import delle pagine
@@ -10,6 +10,8 @@ import Login from './Pages/Login';
 import Profile from './Pages/Profile';
 import Register from './Pages/Register';
 import MoveMethod from './Pages/MoveMethod';
+import AdminPanel from './Pages/AdminPanel'
+import Dashboard from './Pages/Dashboard';
 
 function NavigationBar() {
   const [show, setShow] = useState(false);
@@ -43,8 +45,8 @@ function NavigationBar() {
             <Nav className="ms-auto align-items-center gap-3">
               {token ? (
                 <>
-                  <Button as={Link} to="/create" variant="primary" className="rounded-pill px-4">Nuovo Post</Button>
-                  <Button variant="outline-danger" className="rounded-pill px-3" onClick={handleLogout}>Logout</Button>
+                  <Button as={Link} to="/dashboard" variant="dark" className="rounded-pill px-4 d-none d-lg-block">Vai alla dashboard</Button>
+                  <Button variant="outline-danger" className="rounded-pill px-3 d-none d-lg-block" onClick={handleLogout}>Logout</Button>
                 </>
               ) : (
                 <>
@@ -74,17 +76,26 @@ function NavigationBar() {
             </Nav.Link>
 
             {token && (
-              <Nav.Link as={Link} to="/profile" onClick={handleClose} className="d-flex align-items-center gap-3 fs-5 text-dark fw-semibold">
-                <Person size={22} className="text-dark" /> Profilo
-              </Nav.Link>
+              <div>
+                <Nav.Link as={Link} to="/profile" onClick={handleClose} className="d-flex align-items-center gap-3 fs-5 text-dark fw-semibold">
+                  <Person size={22} className="text-dark" /> Profilo
+                </Nav.Link>
+
+                <Nav.Link as={Link} to="/dashboard" onClick={handleClose} className="d-flex align-items-center gap-3 fs-5 text-dark fw-semibold">
+                  <Grid size={22} className="text-dark" /> Dashboard
+                </Nav.Link>
+              </div>
             )}
 
             <hr />
 
             {token ? (
+
               <Button variant="danger" className="w-100 d-flex align-items-center justify-content-center gap-2" onClick={handleLogout}>
                 <BoxArrowRight size={20} /> Esci
               </Button>
+
+
             ) : (
               <div className="d-flex flex-column gap-2">
                 <Button as={Link} to="/login" variant="outline-dark" className="w-100 rounded-pill" onClick={handleClose}>
@@ -114,6 +125,8 @@ export default function App() {
         <Route path="/move" element={<MoveMethod />} />
         <Route path="/register" element={<Register />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path='/admin-panel' element={<AdminPanel />} />
       </Routes>
       {/* </Container> */}
     </Router>

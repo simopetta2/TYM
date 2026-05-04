@@ -10,10 +10,20 @@ export async function authentication(req, res, next) {
     const jwtToken = parts[1]
     jwt.verify(jwtToken, process.env.JWT_SECRET, async (err, payload) => {
         if (err) return res.status(401).send()
-        const author = await User.findById(payload.id)
-        if (!author) return res.status(401).send()
-        req.authUser = author
+        const user = await User.findById(payload.id)
+        if (!user) return res.status(401).send()
+        req.authUser = user
         next()
     })
 
 }
+
+
+export const isAdmin = (req, res, next) => {
+    // req.authUser è stato popolato dal middleware 'authentication'
+    if (req.authUser && req.authUser.role === 'admin') {
+        next(); // L'utente è admin, procedi
+    } else {
+        res.status(403).json({ message: "Accesso negato: richiesti permessi di amministratore" });
+    }
+};

@@ -8,7 +8,12 @@ const UserSchema = new mongoose.Schema({
     birthDate: { type: String },
     avatar: { type: String },
     password: { type: String, required: false },
-    googleId: { type: String }
+    googleId: { type: String },
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
+    }
 });
 
 
