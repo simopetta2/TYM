@@ -5,43 +5,40 @@ import User from '../models/User.js'
 
 export async function update(req, res) {
     try {
-        const { id } = req.params
+
+        const id = req.params.id || req.user.id;
+
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({
-                message: 'invalid user id'
-            })
+            return res.status(400).json({ message: 'Invalid user id' });
         }
-        const {
-            name,
-            surname,
-            email,
-            birthDate,
-            avatar
-        } = req.body
-        const updatedUser = await User.findByIdAndUpdate(id,
+
+        const { name, surname, email, birthDate, avatar, bio } = req.body;
+
+
+        const updatedUser = await User.findByIdAndUpdate(
+            id,
+            { name, surname, email, birthDate, avatar, bio },
             {
-                name,
-                surname,
-                email,
-                birthDate,
-                avatar
-            },
-            {
-                returnDocument: "after"
-            })
+                returnDocument: 'after',
+                runValidators: true
+            }
+        ).select("-password"); // Mai restituire la password, anche se criptata
+
         if (!updatedUser) {
-            return res.status(404).json({
-                message: 'User not found'
-            })
+            return res.status(404).json({ message: 'User not found' });
         }
-        res.status(200).json({ updatedAuthor })
+
+        res.status(200).json(updatedUser);
+
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        })
+        // Gestione errore email duplicata (Codice errore MongoDB 11000)
+        if (error.code === 11000) {
+            return res.status(400).json({ message: 'Email già in uso.' });
+        }
+
+        res.status(500).json({ message: error.message });
     }
 }
-
 export async function cancell(req, res) {
     try {
         const { id } = req.params
@@ -73,7 +70,7 @@ export async function findAll(req, res) {
         const { page, limit } = req.query
         const usersQuery = User.find()
         if (page && limit) {
-            userQuery.skip((page - 1) * limit).limit(limit)
+            usersQuery.skip((page - 1) * limit).limit(limit)
         }
         const users = await usersQuery
         res.status(200).json(users)

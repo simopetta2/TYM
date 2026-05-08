@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Spinner, Badge } from 'react-bootstrap';
+import { Link } from 'react-bootstrap-icons';
 import { useNavigate } from 'react-router-dom';
+import { apiRequest } from '../Services/api';
 
 const Dashboard = () => {
     const [user, setUser] = useState(null);
@@ -16,21 +18,13 @@ const Dashboard = () => {
 
         const fetchUserData = async () => {
             try {
-                const response = await fetch('http://localhost:3000/user/me', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
+                const data = await apiRequest('/user/me');
+                if (data) {
                     setUser(data);
-                } else {
-                    localStorage.removeItem('token');
-                    navigate('/login');
                 }
             } catch (error) {
                 console.error("Errore fetch utente:", error);
+                navigate('/login');
             } finally {
                 setLoading(false);
             }
@@ -53,7 +47,7 @@ const Dashboard = () => {
             <div className="mb-5 d-flex justify-content-between align-items-center">
                 <div>
                     <h1 className="fw-bold text-dark">
-                        Ciao, {user?.name}! {user?.role === 'admin' && <Badge bg="danger" className="ms-2 fs-6">Amministratore</Badge>}
+                        Ciao, {user?.name}!👋 {user?.role === 'admin' && <Badge bg="danger" className="ms-2 fs-6">Amministratore</Badge>}
                     </h1>
                     <p className="text-muted">Bentornato nella tua area riservata.</p>
                 </div>
@@ -77,7 +71,7 @@ const Dashboard = () => {
                     </Card>
                 </Col>
 
-                {/* Se l'utente è ADMIN, mostriamo una card diversa invece del "Livello Metodo" */}
+                {/* Se l'utente è ADMIN */}
                 <Col md={4}>
                     <Card className="shadow-sm border-0 rounded-4 p-3 border-start border-danger border-4">
                         <Card.Body>
@@ -106,6 +100,86 @@ const Dashboard = () => {
                 </Col>
             </Row>
 
+
+            {user?.role === 'admin' ? (
+                <Row className="w-100 m-0">
+                    {/* Prima Card */}
+                    <Col md={6} className="px-0">
+                        <Card className="border-0 rounded-5 p-4 mt-4 shadow-sm text-center bg-light">
+                            <Card.Img
+                                variant="top"
+                                src='src/assets/calendar.jpg'
+                                style={{ objectFit: 'cover', height: '200px' }}
+                            />
+                            <Card.Body>
+                                <Card.Title>Calendario</Card.Title>
+                                <Card.Text>
+                                    Visualizza i tuoi appuntamenti
+                                </Card.Text>
+                                <Button variant="dark" className='w-100' onClick={() => navigate('/calendar')}>Vai</Button>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+
+                    {/* Seconda Card */}
+                    <Col md={6} className="px-0">
+                        <Card className="border-0 rounded-5 p-4 mt-4 shadow-sm text-center bg-light">
+                            <Card.Img
+                                variant="top"
+                                src='src/assets/calendar.jpg'
+                                style={{ objectFit: 'cover', height: '200px' }}
+                            />
+                            <Card.Body>
+                                <Card.Title>Altro Servizio</Card.Title>
+                                <Card.Text>
+                                    Descrizione di un altro servizio a tutta larghezza
+                                </Card.Text>
+                                <Button variant="dark" className='w-100'>Vai</Button>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
+            ) : (
+                <Row className="w-100 m-0">
+                    {/* Prima Card */}
+                    <Col md={6} className="px-0">
+                        <Card className="border-0 rounded-5 p-4 mt-4 shadow-sm text-center bg-light">
+                            <Card.Img
+                                variant="top"
+                                src='src/assets/calendar.jpg'
+                                style={{ objectFit: 'cover', height: '200px' }}
+                            />
+                            <Card.Body>
+                                <Card.Title>Calendario</Card.Title>
+                                <Card.Text>
+                                    Visualizza i tuoi appuntamenti
+                                </Card.Text>
+                                <Button onClick={() => navigate('/calendar')} variant="dark" className='w-100'>Vai</Button>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+
+                    {/* Seconda Card */}
+                    <Col md={6} className="px-0">
+                        <Card className="border-0 rounded-5 p-4 mt-4 shadow-sm text-center bg-light">
+                            <Card.Img
+                                variant="top"
+                                src='src/assets/calendar.jpg'
+                                style={{ objectFit: 'cover', height: '200px' }}
+                            />
+                            <Card.Body>
+                                <Card.Title>Scheda Allenamento</Card.Title>
+                                <Card.Text>
+                                    Dai un occhiata alle tue schede
+                                </Card.Text>
+                                <Button variant="dark" className='w-100'>Vai</Button>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
+            )
+            }
+
             {/* Azioni Condizionali */}
             <Row className="mt-5">
                 <Col>
@@ -114,7 +188,7 @@ const Dashboard = () => {
                             <>
                                 <h3 className="fw-bold text-danger">Pannello di Controllo</h3>
                                 <p className="mb-4">Come amministratore puoi gestire le schede e gli utenti del sistema.</p>
-                                <Button variant="danger" size="lg" className="rounded-pill px-5">
+                                <Button variant="danger" size="lg" className="rounded-pill px-5" onClick={() => navigate('/admin-panel')}>
                                     Visualizza tutti gli utenti
                                 </Button>
                             </>
@@ -130,7 +204,7 @@ const Dashboard = () => {
                     </Card>
                 </Col>
             </Row>
-        </Container>
+        </Container >
     );
 };
 

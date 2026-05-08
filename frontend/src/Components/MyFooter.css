@@ -1,0 +1,112 @@
+.footer-custom {
+    min-height: 100vh;
+    background-color: #050505;
+    /* Nero profondo */
+    color: #ffffff;
+    padding-top: 80px;
+    border-top: 1px solid #1a1a1a;
+    font-family: 'Inter', sans-serif;
+}
+
+.logo-text {
+    font-weight: 900;
+    letter-spacing: -1px;
+    margin-bottom: 20px;
+}
+
+.logo-text span {
+    color: #e5383b;
+}
+
+.footer-description {
+    color: #888;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.footer-title {
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 2px;
+    margin-bottom: 25px;
+    color: #e5383b;
+}
+
+.footer-links,
+.footer-contact {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 12px;
+}
+
+.footer-links a {
+    color: #ccc;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.footer-links a:hover {
+    color: #e5383b;
+    padding-left: 5px;
+}
+
+/* Newsletter Input */
+.newsletter-box {
+    display: flex;
+    border-bottom: 1px solid #333;
+    padding-bottom: 5px;
+}
+
+.newsletter-box input {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 0.9rem;
+    width: 100%;
+    outline: none;
+}
+
+.btn-send {
+    background: transparent;
+    border: none;
+    color: #e5383b;
+    font-weight: 800;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+/* Social & Bottom */
+.social-links a {
+    color: white;
+    font-size: 1.2rem;
+    margin-right: 20px;
+    transition: 0.3s;
+}
+
+.social-links a:hover {
+    color: #e5383b;
+}
+
+.footer-divider {
+    margin: 60px 0 30px;
+    border-color: #1a1a1a;
+}
+
+.copyright,
+.legal-links a {
+    font-size: 0.8rem;
+    color: #555;
+    text-decoration: none;
+}
+
+.legal-links a {
+    margin-left: 20px;
+}
+
+.text-red {
+    color: #e5383b;
+}

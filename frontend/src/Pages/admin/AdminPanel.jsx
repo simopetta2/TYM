@@ -1,21 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Container, Button, Badge, Image } from 'react-bootstrap';
 import { Trash } from 'react-bootstrap-icons';
-
+import { apiRequest } from '../../Services/api'; // Assicurati che il percorso sia corretto
 const AdminPanel = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
 
     const fetchUsers = async () => {
-        const token = localStorage.getItem('token');
         try {
-            const response = await fetch('http://localhost:3000/user', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (response.ok) {
-                const data = await response.json();
-                setUsers(data);
-            }
+            const data = await apiRequest('/user'); // Gestisce già il token e il base URL
+            if (data) setUsers(data);
         } catch (error) {
             console.error("Errore caricamento lista utenti:", error);
         } finally {
@@ -25,16 +19,10 @@ const AdminPanel = () => {
 
     const deleteUser = async (id) => {
         if (!window.confirm("Sei sicuro di voler eliminare questo utente?")) return;
-        const token = localStorage.getItem('token');
         try {
-            const response = await fetch(`http://localhost:3000/user/${id}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (response.ok) {
-                fetchUsers();
-                alert("Utente eliminato con successo");
-            }
+            await apiRequest(`/user/${id}`, { method: 'DELETE' }); //[cite: 21]
+            fetchUsers();
+            alert("Utente eliminato con successo");
         } catch (error) {
             console.error("Errore durante l'eliminazione:", error);
         }
@@ -47,7 +35,7 @@ const AdminPanel = () => {
     if (loading) return <Container className="py-5 text-center">Caricamento utenti...</Container>;
 
     return (
-        <Container fluid="md" className="py-4">
+        <Container fluid="md" className="py-4 ">
             <h2 className="mb-4 fw-bold text-danger">Gestione Utenti</h2>
 
             {/* responsive="sm" permette lo scroll orizzontale solo su schermi piccoli */}
@@ -61,7 +49,7 @@ const AdminPanel = () => {
                         <th className="text-center">Azioni</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody style={{ borderRadius: "10px" }}>
                     {users.map((u) => (
                         <tr key={u._id}>
                             <td>

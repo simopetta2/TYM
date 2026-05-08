@@ -7,12 +7,13 @@ import authRouter from './routes/auth.js'
 import googleStrategy from './strategy/googleStrategy.js'
 import router from './routes/user.js'
 import { cancell } from './controllers/user.js'
-
+import eventRoutes from './routes/calendar.js'
 
 
 dotenv.config()
 connect()
 const app = express()
+
 
 app.use(cors())
 app.use(express.json())
@@ -23,7 +24,7 @@ app.get('/', (request, response) => {
 passport.use(googleStrategy)
 app.use('/auth', authRouter)
 app.use('/user', router)
-
+app.use('/events', eventRoutes);
 
 
 

@@ -31,6 +31,7 @@ const LoginPage = () => {
             const data = await response.json();
             if (response.ok) {
                 localStorage.setItem('token', data.token);
+
                 navigate('/dashboard');
             } else {
                 setError(data.message || 'Credenziali errate');
@@ -69,7 +70,7 @@ const styles = {
     input: { padding: '12px', borderRadius: '8px', border: '1px solid #ddd', outline: 'none' },
     inputHalf: { padding: '12px', borderRadius: '8px', border: '1px solid #ddd', width: '50%' },
     button: { padding: '12px', borderRadius: '8px', border: 'none', backgroundColor: '#333', color: '#fff', fontWeight: 'bold', cursor: 'pointer' },
-    googleButton: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '10px', borderRadius: '8px', border: '1px solid #ddd', backgroundColor: '#fff', cursor: 'pointer' },
+    googleButton: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', padding: '10px', borderRadius: '8px', border: '1px solid #ddd', backgroundColor: '#fff', cursor: 'pointer', width: '100%' },
     avatarZone: { display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px' },
     circle: { width: '60px', height: '60px', borderRadius: '50%', backgroundColor: '#eee', overflow: 'hidden' },
     img: { width: '100%', height: '100%', objectFit: 'cover' },

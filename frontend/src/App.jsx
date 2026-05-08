@@ -1,28 +1,70 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useNavigate } from 'react-router-dom';
-import { Navbar, Nav, Container, Button, Offcanvas } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate, Navigate } from 'react-router-dom';
+import { Navbar, Nav, Container, Button, Offcanvas, Image, Dropdown } from 'react-bootstrap';
 import { List, House, Person, BoxArrowRight, PersonPlus, Grid } from 'react-bootstrap-icons';
 import LogoTYM from './assets/logoTym';
 
-// Import delle pagine
 import Home from './Pages/Home';
 import Login from './Pages/Login';
 import Profile from './Pages/Profile';
+import Calendar from './Pages/Calendar';
 import Register from './Pages/Register';
-import MoveMethod from './Pages/MoveMethod';
-import AdminPanel from './Pages/AdminPanel'
 import Dashboard from './Pages/Dashboard';
+import MoveMethod from './Pages/MoveMethod';
+import AdminPanel from './Pages/admin/AdminPanel';
+import MyFooter from './Components/MyFooter';
+
+// --- PROTECTED ROUTE FIX ---
+const ProtectedRoute = ({ children, adminOnly = false }) => {
+  const token = localStorage.getItem('token');
+  const userData = localStorage.getItem('user_data');
+
+  // Evita l'errore "undefined" nel parse
+  let user = null;
+  if (userData && userData !== "undefined") {
+    try {
+      user = JSON.parse(userData);
+    } catch (e) { console.error("Errore parse user", e); }
+  }
+
+  if (!token) return <Navigate to="/login" replace />;
+  if (adminOnly && user?.role !== 'admin') return <Navigate to="/dashboard" replace />;
+
+  return children;
+};
 
 function NavigationBar() {
   const [show, setShow] = useState(false);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
   const token = localStorage.getItem('token');
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
 
+  useEffect(() => {
+    if (token) {
+      fetch('http://localhost:3000/user/me', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.message) throw new Error();
+          setUser(data);
+          localStorage.setItem('user_data', JSON.stringify(data));
+        })
+        .catch(() => {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user_data');
+          setUser(null);
+        });
+    }
+  }, [token]);
+
   const handleLogout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('user_data');
+    setUser(null);
     handleClose();
     navigate('/');
   };
@@ -31,82 +73,64 @@ function NavigationBar() {
     <>
       <Navbar className="navbar sticky-top mb-4 bg-white shadow-sm">
         <Container>
+          {/* Menu a sinistra come prima */}
           <Button variant="link" className="text-dark p-0 me-3" onClick={handleShow}>
             <List size={32} />
           </Button>
 
-          <Navbar.Brand as={Link} to="/" className="d-flex align-items-center gap-2">
+          <Navbar.Brand as={Link} to="/" className="d-flex align-items-center gap-2 me-auto">
             <LogoTYM size={40} />
-            <span className="fw-bold text-dark fs-3">Train Yor Movement</span>
+            <span className="fw-bold text-dark fs-3 d-none d-sm-block">Train Your Movement</span>
           </Navbar.Brand>
 
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="ms-auto align-items-center gap-3">
-              {token ? (
-                <>
-                  <Button as={Link} to="/dashboard" variant="dark" className="rounded-pill px-4 d-none d-lg-block">Vai alla dashboard</Button>
-                  <Button variant="outline-danger" className="rounded-pill px-3 d-none d-lg-block" onClick={handleLogout}>Logout</Button>
-                </>
-              ) : (
-                <>
-                  <Nav.Link as={Link} to="/login" className="fw-bold text-dark d-none d-lg-block">Accedi</Nav.Link>
-                  {/* PULSANTE REGISTRATI NELLA NAVBAR */}
-                  <Button as={Link} to="/register" variant="dark" className="rounded-pill px-4 d-none d-lg-block">
-                    Inizia
-                  </Button>
-                </>
-              )}
-            </Nav>
-          </Navbar.Collapse>
+          <Nav className="ms-auto align-items-center">
+            {token && user ? (
+              <Dropdown align="end">
+                <Dropdown.Toggle variant="link" id="dropdown-user" className="p-0 border-0 no-caret">
+                  <Image
+                    src={user.avatar}
+                    roundedCircle
+                    style={{ width: '45px', height: '45px', objectFit: 'cover', border: '2px solid #e5383b' }}
+                  />
+                </Dropdown.Toggle>
+                <Dropdown.Menu className="shadow border-0 mt-2">
+                  <Dropdown.Header className="fw-bold text-dark">{user.name} {user.surname}</Dropdown.Header>
+                  <Dropdown.Divider />
+                  <Dropdown.Item as={Link} to="/profile"><Person className="me-2" /> Profilo</Dropdown.Item>
+                  <Dropdown.Item as={Link} to="/dashboard"><Grid className="me-2" /> Dashboard</Dropdown.Item>
+                  <Dropdown.Divider />
+                  <Dropdown.Item onClick={handleLogout} className="text-danger"><BoxArrowRight className="me-2" /> Logout</Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
+            ) : (
+              <div className="d-flex gap-3">
+                <Nav.Link as={Link} to="/login" className="fw-bold text-dark d-none d-lg-block align-self-center">Accedi</Nav.Link>
+                <Button as={Link} to="/register" variant="dark" className="rounded-pill px-4">Inizia</Button>
+              </div>
+            )}
+          </Nav>
         </Container>
       </Navbar>
 
       <Offcanvas show={show} onHide={handleClose} placement="start">
         <Offcanvas.Header closeButton>
-          <Offcanvas.Title className="ps-2">
-            <LogoTYM size={50} />
+          <Offcanvas.Title>
+            {user ? <div className="d-flex align-items-center gap-2"><Image src={user.avatar} roundedCircle style={{ width: '40px' }} /><span className="fw-bold">{user.name}</span></div> : <LogoTYM size={50} />}
           </Offcanvas.Title>
         </Offcanvas.Header>
-
         <Offcanvas.Body>
           <Nav className="flex-column gap-4">
-            <Nav.Link as={Link} to="/" onClick={handleClose} className="d-flex align-items-center gap-3 fs-5 text-dark fw-semibold">
-              <House size={22} className="text-dark" /> Home
-            </Nav.Link>
-
+            <Nav.Link as={Link} to="/" onClick={handleClose} className="d-flex align-items-center gap-3 fs-5 text-dark fw-semibold"><House size={22} /> Home</Nav.Link>
             {token && (
-              <div>
-                <Nav.Link as={Link} to="/profile" onClick={handleClose} className="d-flex align-items-center gap-3 fs-5 text-dark fw-semibold">
-                  <Person size={22} className="text-dark" /> Profilo
-                </Nav.Link>
-
-                <Nav.Link as={Link} to="/dashboard" onClick={handleClose} className="d-flex align-items-center gap-3 fs-5 text-dark fw-semibold">
-                  <Grid size={22} className="text-dark" /> Dashboard
-                </Nav.Link>
-              </div>
+              <>
+                <Nav.Link as={Link} to="/profile" onClick={handleClose} className="d-flex align-items-center gap-3 fs-5 text-dark fw-semibold"><Person size={22} /> Profilo</Nav.Link>
+                <Nav.Link as={Link} to="/dashboard" onClick={handleClose} className="d-flex align-items-center gap-3 fs-5 text-dark fw-semibold"><Grid size={22} /> Dashboard</Nav.Link>
+              </>
             )}
-
             <hr />
-
-            {token ? (
-
-              <Button variant="danger" className="w-100 d-flex align-items-center justify-content-center gap-2" onClick={handleLogout}>
-                <BoxArrowRight size={20} /> Esci
-              </Button>
-
-
-            ) : (
-              <div className="d-flex flex-column gap-2">
-                <Button as={Link} to="/login" variant="outline-dark" className="w-100 rounded-pill" onClick={handleClose}>
-                  Accedi
-                </Button>
-                {/* PULSANTE REGISTRATI NEL MENU LATERALE */}
-                <Button as={Link} to="/register" variant="dark" className="w-100 rounded-pill d-flex align-items-center justify-content-center gap-2" onClick={handleClose}>
-                  <PersonPlus size={20} /> Registrati ora
-                </Button>
-              </div>
-            )}
+            <Button variant={token ? "danger" : "dark"} className="w-100 rounded-pill" onClick={token ? handleLogout : () => navigate('/login')}>
+              {token ? "Esci" : "Accedi"}
+            </Button>
           </Nav>
         </Offcanvas.Body>
       </Offcanvas>
@@ -117,18 +141,22 @@ function NavigationBar() {
 export default function App() {
   return (
     <Router>
-      <NavigationBar />
-      {/* <Container> */}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/move" element={<MoveMethod />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path='/admin-panel' element={<AdminPanel />} />
-      </Routes>
-      {/* </Container> */}
+      <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <NavigationBar />
+        <main style={{ flex: 1 }}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/move" element={<MoveMethod />} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
+            <Route path="/admin-panel" element={<ProtectedRoute adminOnly={true}><AdminPanel /></ProtectedRoute>} />
+          </Routes>
+        </main>
+        <MyFooter />
+      </div>
     </Router>
   );
 }
