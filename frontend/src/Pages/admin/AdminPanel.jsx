@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Container, Button, Badge, Image } from 'react-bootstrap';
-import { Trash } from 'react-bootstrap-icons';
-import { apiRequest } from '../../Services/api'; // Assicurati che il percorso sia corretto
+import { Table, Container, Button, Badge, Image, Stack } from 'react-bootstrap';
+import { Trash, PersonBoundingBox } from 'react-bootstrap-icons';
+import { useNavigate } from 'react-router-dom';
+import { apiRequest } from '../../Services/api';
+
+
 const AdminPanel = () => {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     const fetchUsers = async () => {
         try {
-            const data = await apiRequest('/user'); // Gestisce già il token e il base URL
+            const data = await apiRequest('/user');
             if (data) setUsers(data);
         } catch (error) {
             console.error("Errore caricamento lista utenti:", error);
@@ -20,7 +24,7 @@ const AdminPanel = () => {
     const deleteUser = async (id) => {
         if (!window.confirm("Sei sicuro di voler eliminare questo utente?")) return;
         try {
-            await apiRequest(`/user/${id}`, { method: 'DELETE' }); //[cite: 21]
+            await apiRequest(`/user/${id}`, { method: 'DELETE' });
             fetchUsers();
             alert("Utente eliminato con successo");
         } catch (error) {
@@ -35,10 +39,9 @@ const AdminPanel = () => {
     if (loading) return <Container className="py-5 text-center">Caricamento utenti...</Container>;
 
     return (
-        <Container fluid="md" className="py-4 ">
+        <Container fluid="md" className="py-4">
             <h2 className="mb-4 fw-bold text-danger">Gestione Utenti</h2>
 
-            {/* responsive="sm" permette lo scroll orizzontale solo su schermi piccoli */}
             <Table striped bordered hover responsive="sm" className="shadow-sm align-middle">
                 <thead className="table-dark">
                     <tr>
@@ -49,7 +52,7 @@ const AdminPanel = () => {
                         <th className="text-center">Azioni</th>
                     </tr>
                 </thead>
-                <tbody style={{ borderRadius: "10px" }}>
+                <tbody>
                     {users.map((u) => (
                         <tr key={u._id}>
                             <td>
@@ -62,7 +65,6 @@ const AdminPanel = () => {
                             </td>
                             <td>
                                 <div className="fw-bold">{u.name} {u.surname}</div>
-                                {/* Mostriamo l'email sotto il nome solo su mobile per risparmiare spazio */}
                                 <div className="d-md-none small text-muted text-break">{u.email}</div>
                             </td>
                             <td className="d-none d-md-table-cell text-break">
@@ -74,15 +76,34 @@ const AdminPanel = () => {
                                 </Badge>
                             </td>
                             <td className="text-center">
-                                <Button
-                                    variant="outline-danger"
-                                    size="sm"
-                                    onClick={() => deleteUser(u._id)}
-                                    className="p-2"
-                                >
-                                    <Trash size={18} />
-                                    <span className="d-none d-lg-inline ms-1">Elimina</span>
-                                </Button>
+                                {/* Stack per allineare i pulsanti orizzontalmente */}
+                                <Stack direction="horizontal" gap={2} className="justify-content-center">
+
+                                    {/* NUOVO PULSANTE VISUALIZZA PROFILO */}
+                                    <Button
+                                        variant="outline-dark"
+                                        size="sm"
+                                        className="p-2"
+                                        onClick={() => navigate(`/userprofile/${u._id}`)} // Assicurati che la rotta sia corretta
+                                        title="Visualizza Profilo"
+                                    >
+                                        <PersonBoundingBox size={18} />
+                                        <span className="d-none d-lg-inline ms-1">Profilo</span>
+                                    </Button>
+
+                                    {/* PULSANTE ELIMINA */}
+                                    <Button
+                                        variant="outline-danger"
+                                        size="sm"
+                                        onClick={() => deleteUser(u._id)}
+                                        className="p-2"
+                                        title="Elimina Utente"
+                                    >
+                                        <Trash size={18} />
+                                        <span className="d-none d-lg-inline ms-1">Elimina</span>
+                                    </Button>
+
+                                </Stack>
                             </td>
                         </tr>
                     ))}

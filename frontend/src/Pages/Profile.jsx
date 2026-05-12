@@ -2,14 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Badge, Spinner, Alert } from 'react-bootstrap';
 import { PersonCircle, ShieldLock, Gear, Camera, Save, PencilSquare, Trophy } from 'react-bootstrap-icons';
 import { apiRequest } from '../Services/api';
-
+import { useNavigate } from 'react-router-dom';
 const Profile = () => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [isEditing, setIsEditing] = useState(false);
     const [message, setMessage] = useState(null);
     const [formData, setFormData] = useState({ name: '', surname: '', email: '', bio: '' });
-
+    const navigate = useNavigate();
     useEffect(() => {
         const fetchProfile = async () => {
             try {
@@ -74,9 +74,7 @@ const Profile = () => {
                             <Badge bg="dark" className="rounded-pill px-3 py-2 text-uppercase fw-bold" style={{ fontSize: '0.7rem' }}>
                                 {user?.role || 'Atleta'}
                             </Badge>
-                            <Badge bg="light" text="dark" className="rounded-pill px-3 py-2 text-uppercase fw-bold shadow-sm border" style={{ fontSize: '0.7rem' }}>
-                                Membro dal 2024
-                            </Badge>
+
                         </div>
                     </div>
                 </div>
@@ -133,7 +131,7 @@ const Profile = () => {
                                                 className="border-0 bg-light p-3 rounded-3 shadow-none"
                                                 value={formData.email}
                                                 readOnly={!isEditing}
-                                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+
                                             />
                                         </Form.Group>
                                     </Col>
@@ -179,10 +177,10 @@ const Profile = () => {
                                     <ShieldLock className="text-danger" /> Sicurezza
                                 </h5>
                                 <div className="d-grid gap-2">
-                                    <Button variant="light" className="text-start p-3 rounded-3 border-0 fw-bold small text-muted">
-                                        Cambia Password
+                                    <Button onClick={() => navigate('/dashboard')} variant="light" className="text-start p-3 rounded-3 border-0 fw-bold small text-muted">
+                                        Dashboard
                                     </Button>
-                                    <Button variant="light" className="text-start p-3 rounded-3 border-0 fw-bold small text-muted">
+                                    <Button onClick={() => navigate('/dashboard')} variant="light" className="text-start p-3 rounded-3 border-0 fw-bold small text-muted">
                                         Autenticazione 2FA
                                     </Button>
                                 </div>

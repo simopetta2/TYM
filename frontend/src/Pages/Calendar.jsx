@@ -107,6 +107,7 @@ const Calendar = () => {
         if (!isUserAdmin || !window.confirm("Eliminare la sessione?")) return;
         try {
             await apiRequest(`/events/${eventData.id}`, { method: 'DELETE' });
+
             setShowModal(false);
             loadCalendarData();
         } catch (error) {

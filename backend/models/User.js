@@ -19,7 +19,9 @@ const UserSchema = new mongoose.Schema({
         trim: true,
         maxLength: 500,
         default: ""
-    }
+    },
+    weight: { type: Number, default: null },
+    height: { type: Number, default: null }
 });
 
 

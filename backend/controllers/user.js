@@ -12,17 +12,17 @@ export async function update(req, res) {
             return res.status(400).json({ message: 'Invalid user id' });
         }
 
-        const { name, surname, email, birthDate, avatar, bio } = req.body;
+        const { name, surname, email, birthDate, avatar, bio, weight, height } = req.body;
 
 
         const updatedUser = await User.findByIdAndUpdate(
             id,
-            { name, surname, email, birthDate, avatar, bio },
+            { name, surname, email, birthDate, avatar, bio, weight, height },
             {
                 returnDocument: 'after',
                 runValidators: true
             }
-        ).select("-password"); // Mai restituire la password, anche se criptata
+        ).select("-password");
 
         if (!updatedUser) {
             return res.status(404).json({ message: 'User not found' });
@@ -31,7 +31,7 @@ export async function update(req, res) {
         res.status(200).json(updatedUser);
 
     } catch (error) {
-        // Gestione errore email duplicata (Codice errore MongoDB 11000)
+
         if (error.code === 11000) {
             return res.status(400).json({ message: 'Email già in uso.' });
         }
@@ -44,7 +44,7 @@ export async function cancell(req, res) {
         const { id } = req.params
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({
-                message: 'invalid gf id'
+                message: 'invalid user id'
             })
         }
         const deleteUser = await User.findByIdAndDelete(id)

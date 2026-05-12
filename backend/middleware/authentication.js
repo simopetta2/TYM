@@ -20,9 +20,9 @@ export async function authentication(req, res, next) {
 
 
 export const isAdmin = (req, res, next) => {
-    // req.authUser è stato popolato dal middleware 'authentication'
+
     if (req.authUser && req.authUser.role === 'admin') {
-        next(); // L'utente è admin, procedi
+        next();
     } else {
         res.status(403).json({ message: "Accesso negato: richiesti permessi di amministratore" });
     }

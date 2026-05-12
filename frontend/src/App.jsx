@@ -13,13 +13,14 @@ import Dashboard from './Pages/Dashboard';
 import MoveMethod from './Pages/MoveMethod';
 import AdminPanel from './Pages/admin/AdminPanel';
 import MyFooter from './Components/MyFooter';
+import TrainingSchedules from './Pages/TrainingSchedules';
+import UserProfile from './Pages/UserProfile'
 
-// --- PROTECTED ROUTE FIX ---
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const token = localStorage.getItem('token');
   const userData = localStorage.getItem('user_data');
 
-  // Evita l'errore "undefined" nel parse
+
   let user = null;
   if (userData && userData !== "undefined") {
     try {
@@ -150,6 +151,8 @@ export default function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/register" element={<Register />} />
             <Route path="/move" element={<MoveMethod />} />
+            <Route path="/userprofile/:id" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
+            <Route path="/schedules" element={<ProtectedRoute><TrainingSchedules /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
             <Route path="/admin-panel" element={<ProtectedRoute adminOnly={true}><AdminPanel /></ProtectedRoute>} />

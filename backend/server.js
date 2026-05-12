@@ -8,7 +8,7 @@ import googleStrategy from './strategy/googleStrategy.js'
 import router from './routes/user.js'
 import { cancell } from './controllers/user.js'
 import eventRoutes from './routes/calendar.js'
-
+import scheduleRoutes from './routes/schedule.js'
 
 dotenv.config()
 connect()
@@ -25,6 +25,7 @@ passport.use(googleStrategy)
 app.use('/auth', authRouter)
 app.use('/user', router)
 app.use('/events', eventRoutes);
+app.use('/schedule', scheduleRoutes);
 
 
 

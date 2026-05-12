@@ -9,7 +9,7 @@ const MyFooter = () => {
         <footer className="footer-custom">
             <Container>
                 <Row className="gy-4">
-                    {/* LOGO E MISSION */}
+
                     <Col lg={4} md={12}>
                         <div className="footer-brand">
                             <h2 className="logo-text">TYM<span>.</span></h2>
@@ -25,7 +25,7 @@ const MyFooter = () => {
                         </div>
                     </Col>
 
-                    {/* LINK RAPIDI */}
+
                     <Col lg={2} md={4} className="ps-lg-5">
                         <h5 className="footer-title">Esplora</h5>
                         <ul className="footer-links">
@@ -36,7 +36,7 @@ const MyFooter = () => {
                         </ul>
                     </Col>
 
-                    {/* CONTATTI */}
+
                     <Col lg={3} md={4}>
                         <h5 className="footer-title">Contatti</h5>
                         <ul className="footer-contact">
@@ -45,7 +45,7 @@ const MyFooter = () => {
                         </ul>
                     </Col>
 
-                    {/* NEWSLETTER O CALL TO ACTION */}
+
                     <Col lg={3} md={4}>
                         <h5 className="footer-title">Rimani Aggiornato</h5>
                         <p className="small text-muted">Ricevi consigli tecnici ogni settimana.</p>

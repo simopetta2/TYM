@@ -54,8 +54,8 @@ const Dashboard = () => {
 
                 {/* Se l'utente è admin, mostriamo un pulsante speciale */}
                 {user?.role === 'admin' && (
-                    <Button variant="outline-danger" onClick={() => navigate('/admin-panel')}>
-                        Gestione Utenti
+                    <Button variant="outline-danger" onClick={() => navigate('/profile')}>
+                        Profilo
                     </Button>
                 )}
             </div>
@@ -114,7 +114,7 @@ const Dashboard = () => {
                             <Card.Body>
                                 <Card.Title>Calendario</Card.Title>
                                 <Card.Text>
-                                    Visualizza i tuoi appuntamenti
+                                    Gestisci tutti gli appuntamenti
                                 </Card.Text>
                                 <Button variant="dark" className='w-100' onClick={() => navigate('/calendar')}>Vai</Button>
                             </Card.Body>
@@ -130,11 +130,11 @@ const Dashboard = () => {
                                 style={{ objectFit: 'cover', height: '200px' }}
                             />
                             <Card.Body>
-                                <Card.Title>Altro Servizio</Card.Title>
+                                <Card.Title>Scheda Allenamento</Card.Title>
                                 <Card.Text>
-                                    Descrizione di un altro servizio a tutta larghezza
+                                    Gestisci tutte le schede degli utenti
                                 </Card.Text>
-                                <Button variant="dark" className='w-100'>Vai</Button>
+                                <Button onClick={() => navigate('/schedules')} variant="dark" className='w-100'>Vai</Button>
                             </Card.Body>
                         </Card>
                     </Col>
@@ -172,7 +172,7 @@ const Dashboard = () => {
                                 <Card.Text>
                                     Dai un occhiata alle tue schede
                                 </Card.Text>
-                                <Button variant="dark" className='w-100'>Vai</Button>
+                                <Button onClick={() => navigate('/schedules')} variant="dark" className='w-100'>Vai</Button>
                             </Card.Body>
                         </Card>
                     </Col>
