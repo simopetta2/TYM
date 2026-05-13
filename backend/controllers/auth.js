@@ -32,10 +32,10 @@ export const googleCallback = async (req, res) => {
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
 
 
-        res.redirect(`http://localhost:5173/login?token=${token}`);
+        res.redirect(`${process.env.GOOGLE_FRONTEND_PATH}?token=${token}`);
     } catch (error) {
         console.error("Errore nel Google Callback:", error);
 
-        res.redirect('http://localhost:5173/login?error=auth_failed');
+        res.redirect(`${process.env.GOOGLE_FRONTEND_PATH}?error=auth_failed`);
     }
 };
