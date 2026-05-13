@@ -19,7 +19,7 @@ const RegisterPage = () => {
         Object.keys(formData).forEach(key => data.append(key, formData[key]));
         if (avatar) data.append('avatar', avatar);
 
-        const response = await fetch('http://localhost:3000/user', { method: 'POST', body: data });
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/user`, { method: 'POST', body: data });
         if (response.ok) navigate('/login');
         else alert("Errore durante la registrazione");
     };

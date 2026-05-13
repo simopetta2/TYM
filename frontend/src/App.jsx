@@ -54,7 +54,7 @@ function NavigationBar() {
 
   useEffect(() => {
     if (token) {
-      fetch('http://localhost:3000/user/me', {
+      fetch(`${import.meta.env.VITE_API_URL}/user/me`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
         .then(res => res.json())
