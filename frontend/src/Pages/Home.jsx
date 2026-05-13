@@ -59,7 +59,7 @@ const Home = () => {
                         <span className="quote-mark">“</span>
                         <h2>Allenarsi meglio viene prima di allenarsi di più.</h2>
                         <p>La qualità batte la quantità, sempre. Gestione dei carichi, tecnica impeccabile e programmazione intelligente: questa è la base della tua nuova forma fisica.</p>
-                        <Button className="btn-outline-red btn-danger">SCOPRI LA MIA FILOSOFIA</Button>
+
                     </div>
                 </Container>
             </section>

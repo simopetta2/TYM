@@ -167,7 +167,7 @@ const Profile = () => {
                             <Card className="border-0 shadow-lg rounded-4 p-4 text-center bg-dark text-white">
                                 <Trophy size={40} className="mb-3" style={{ color: '#e5383b' }} />
                                 <h5 className="text-uppercase fw-bold opacity-75">Status Allenamenti</h5>
-                                <h2 className="display-4 fw-black m-0">24</h2>
+                                <h2 className="display-4 fw-black m-0">0</h2>
                                 <p className="small text-uppercase">Sessioni completate</p>
                             </Card>
 

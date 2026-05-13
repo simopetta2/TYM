@@ -31,7 +31,7 @@ const MyFooter = () => {
                         <ul className="footer-links">
                             <li><Link to="/">Home</Link></li>
                             <li><Link to="/move">Metodo M.O.V.E.</Link></li>
-                            <li><Link to="/about">Chi Sono</Link></li>
+                            <li><Link to="/register">Unisciti A Noi</Link></li>
                             <li><Link to="/contact">Contatti</Link></li>
                         </ul>
                     </Col>
@@ -41,7 +41,7 @@ const MyFooter = () => {
                         <h5 className="footer-title">Contatti</h5>
                         <ul className="footer-contact">
                             <li><FiMail className="me-2 text-red" /> info@tymperformance.it</li>
-                            <li><FiMapPin className="me-2 text-red" />Watsapp - 3270066600</li>
+                            <li><FiMapPin className="me-2 text-red" />Watsapp - 39 012 345 6789</li>
                         </ul>
                     </Col>
 

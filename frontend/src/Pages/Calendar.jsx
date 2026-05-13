@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Card, Spinner, Modal, Button, Form } from 'react-bootstrap';
-import { Trash, CalendarPlus, InfoCircle, Person, ArrowLeft } from 'react-bootstrap-icons';
+import { Container, Card, Spinner, Modal, Button, Form, Toast, ToastContainer } from 'react-bootstrap';
+import { Trash, CalendarPlus, Person, ArrowLeft, CheckCircleFill, ExclamationTriangleFill } from 'react-bootstrap-icons';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
@@ -8,13 +8,21 @@ import { apiRequest } from '../Services/api';
 import { useNavigate } from 'react-router-dom';
 
 const Calendar = () => {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     const [events, setEvents] = useState([]);
     const [users, setUsers] = useState([]);
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
+
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [toast, setToast] = useState({ show: false, message: '', variant: 'success' });
+
     const [eventData, setEventData] = useState({ id: null, title: '', start: '', description: '', user: '' });
+
+    const showMessage = (msg, v = 'success') => {
+        setToast({ show: true, message: msg, variant: v });
+    };
 
     const init = async () => {
         setLoading(true);
@@ -59,22 +67,12 @@ const Calendar = () => {
     const isUserAdmin = user?.role === 'admin';
 
     const getAthleteName = (eventUserField) => {
-
         if (!eventUserField || users.length === 0) return "CARICAMENTO...";
         const targetId = typeof eventUserField === 'object' ? eventUserField._id : eventUserField;
-
-        const found = users.find(u => {
-            const userId = String(u._id).trim();
-            const searchId = String(targetId).trim();
-            return userId === searchId;
-        });
-
-        if (found) {
-            return `${found.name} ${found.surname}`.toUpperCase();
-        }
-
-        return "NON TROVATO (ID: " + targetId + ")";
+        const found = users.find(u => String(u._id).trim() === String(targetId).trim());
+        return found ? `${found.name} ${found.surname}`.toUpperCase() : "NON TROVATO";
     };
+
     const handleDateClick = (arg) => {
         if (!isUserAdmin) return;
         setEventData({ id: null, title: '', start: arg.dateStr, description: '', user: '' });
@@ -94,26 +92,33 @@ const Calendar = () => {
 
     const handleSave = async () => {
         if (!isUserAdmin) return;
+        if (!eventData.title || !eventData.user || !eventData.start) {
+            showMessage("Compila i campi obbligatori", "danger");
+            return;
+        }
+
         try {
             const method = eventData.id ? 'PATCH' : 'POST';
             const endpoint = eventData.id ? `/events/${eventData.id}` : '/events';
             await apiRequest(endpoint, { method, body: JSON.stringify(eventData) });
+
+            showMessage(eventData.id ? "Sessione aggiornata" : "Nuova sessione creata");
             setShowModal(false);
             loadCalendarData();
         } catch (error) {
-            alert("Errore salvataggio");
+            showMessage("Errore durante il salvataggio", "danger");
         }
     };
 
-    const handleDelete = async () => {
-        if (!isUserAdmin || !window.confirm("Eliminare la sessione?")) return;
+    const handleConfirmDelete = async () => {
         try {
             await apiRequest(`/events/${eventData.id}`, { method: 'DELETE' });
-
+            showMessage("Sessione eliminata", "dark");
+            setShowDeleteModal(false);
             setShowModal(false);
             loadCalendarData();
         } catch (error) {
-            alert("Errore eliminazione");
+            showMessage("Errore durante l'eliminazione", "danger");
         }
     };
 
@@ -133,7 +138,7 @@ const Calendar = () => {
                 >
                     <ArrowLeft /> TORNA INDIETRO
                 </Button>
-                {/* Header Moderno */}
+
                 <div className="d-flex justify-content-between align-items-center mb-5">
                     <div>
                         <h1 className="fw-black text-dark m-0" style={{ fontSize: '2.8rem', letterSpacing: '-2px', lineHeight: '1' }}>
@@ -148,9 +153,8 @@ const Calendar = () => {
                     )}
                 </div>
 
-                {/* Card Calendario */}
                 <Card className="border-0 shadow-lg rounded-4 overflow-hidden">
-                    <Card.Body className="p-4 bg-white">
+                    <Card.Body className="p-4 bg-white text-dark">
                         <FullCalendar
                             plugins={[dayGridPlugin, interactionPlugin]}
                             initialView="dayGridMonth"
@@ -165,7 +169,7 @@ const Calendar = () => {
                 </Card>
             </Container>
 
-            {/* Modal Light Modern */}
+            {/* Modal Edit */}
             <Modal show={showModal} onHide={() => setShowModal(false)} centered className="calendar-modal">
                 <Modal.Header closeButton className="border-0 pb-0">
                     <Modal.Title className="fw-black text-dark text-uppercase" style={{ letterSpacing: '-1px' }}>
@@ -205,7 +209,7 @@ const Calendar = () => {
                 </Modal.Body>
                 <Modal.Footer className="border-0 justify-content-between pb-4">
                     {eventData.id && isUserAdmin && (
-                        <Button variant="link" onClick={handleDelete} className="text-danger p-0 border-0"><Trash size={22} /></Button>
+                        <Button variant="link" onClick={() => setShowDeleteModal(true)} className="text-danger p-0 border-0"><Trash size={22} /></Button>
                     )}
                     <div className="ms-auto">
                         <Button variant="light" className="rounded-pill px-4 me-2 fw-bold text-muted border-0" onClick={() => setShowModal(false)}>CHIUDI</Button>
@@ -216,44 +220,89 @@ const Calendar = () => {
                 </Modal.Footer>
             </Modal>
 
+            {/* Modal Delete */}
+            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+                <Modal.Body className="text-center p-5">
+                    <Trash size={60} className="text-danger mb-4 opacity-75" />
+                    <h3 className="fw-bold text-dark">Eliminare sessione?</h3>
+                    <p className="text-muted">L'atleta non vedrà più questo allenamento nel suo calendario.</p>
+                    <div className="d-flex gap-3 justify-content-center mt-4">
+                        <Button variant="light" className="rounded-pill px-4 fw-bold" onClick={() => setShowDeleteModal(false)}>Annulla</Button>
+                        <Button variant="danger" className="rounded-pill px-4 fw-bold shadow-sm" onClick={handleConfirmDelete}>Sì, Elimina</Button>
+                    </div>
+                </Modal.Body>
+            </Modal>
+
+            {/* Toasts */}
+            <ToastContainer position="bottom-end" className="p-3" style={{ zIndex: 9999 }}>
+                <Toast onClose={() => setToast({ ...toast, show: false })} show={toast.show} delay={3000} autohide className={`border-0 shadow-lg bg-${toast.variant} text-white`}>
+                    <Toast.Body className="d-flex align-items-center justify-content-between p-3">
+                        <div className="d-flex align-items-center gap-2">
+                            {toast.variant === 'danger' ? <ExclamationTriangleFill size={18} /> : <CheckCircleFill size={18} />}
+                            <strong className="fw-bold">{toast.message}</strong>
+                        </div>
+                        <Button variant="link" className="p-0 text-white text-decoration-none fw-bold" onClick={() => setToast({ ...toast, show: false })}>✕</Button>
+                    </Toast.Body>
+                </Toast>
+            </ToastContainer>
+
             <style>{`
-                @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-                
                 .calendar-main-container { font-family: 'Inter', sans-serif; }
                 .fw-black { font-weight: 900; }
                 
-                /* RIMOZIONE BLU E RESET FULLCALENDAR */
-                .fc .fc-toolbar-title { font-weight: 900; text-transform: uppercase; letter-spacing: -1px; color: #212529; }
-                .fc .fc-button { background: #212529 !important; border: none !important; border-radius: 50px !important; text-transform: uppercase; font-size: 0.7rem !important; font-weight: 700 !important; transition: all 0.2s; }
-                .fc .fc-button:hover { background: #e5383b !important; }
-                .fc .fc-button-primary:not(:disabled).fc-button-active, .fc .fc-button-primary:not(:disabled):active { background: #e5383b !important; }
+                /* RESET TOTALE BLU FULLCALENDAR */
+                .fc .fc-toolbar-title { font-weight: 900 !important; text-transform: uppercase; letter-spacing: -1px; color: #212529 !important; }
                 
-                /* Numeri giorni e link giorni */
-                .fc-daygrid-day-number, .fc-col-header-cell-cushion { 
+                /* Bottoni (Prev, Next, Today) */
+                .fc .fc-button-primary { 
+                    background-color: #212529 !important; 
+                    border: none !important; 
+                    border-radius: 50px !important; 
+                    font-weight: 700 !important; 
+                    text-transform: uppercase !important; 
+                    font-size: 0.75rem !important;
+                    box-shadow: none !important;
+                }
+                .fc .fc-button-primary:hover { background-color: #e5383b !important; }
+                .fc .fc-button-primary:disabled { background-color: #adb5bd !important; }
+                .fc .fc-button-primary:not(:disabled):active, 
+                .fc .fc-button-primary:not(:disabled).fc-button-active { 
+                    background-color: #e5383b !important; 
+                }
+
+                /* Header Giorni (Lun, Mar...) */
+                .fc-col-header-cell-cushion { 
+                    color: #adb5bd !important; 
+                    text-decoration: none !important; 
+                    text-transform: uppercase; 
+                    font-size: 0.8rem; 
+                }
+
+                /* Numeri dei giorni */
+                .fc-daygrid-day-number { 
                     color: #212529 !important; 
                     text-decoration: none !important; 
-                    font-weight: 700 !important;
-                    text-transform: uppercase;
-                    font-size: 0.8rem;
+                    font-weight: 700 !important; 
                 }
-                .fc-col-header-cell-cushion { color: #adb5bd !important; }
 
-                /* Eventi nel calendario */
+                /* Eventi (Pillole Rosse) */
                 .fc-event { 
                     background-color: #e5383b !important; 
                     border: none !important; 
-                    border-radius: 4px !important; 
-                    padding: 2px 8px !important;
-                    font-weight: 600 !important;
-                    font-size: 0.85rem !important;
+                    border-radius: 6px !important; 
+                    padding: 3px 8px !important; 
+                    font-weight: 600 !important; 
+                    cursor: pointer;
+                    transition: transform 0.2s;
                 }
+                .fc-event:hover { transform: scale(1.02); }
 
+                /* Giorno Corrente */
                 .fc-day-today { background: rgba(229, 56, 59, 0.05) !important; }
 
-                /* Modal Styling */
+                /* Modal & UI */
                 .calendar-modal .modal-content { border-radius: 24px; border: none; }
                 .bg-light { background-color: #f4f4f4 !important; }
-                input:read-only, textarea:read-only { background-color: #fbfbfb !important; border: 1px dashed #eee !important; }
             `}</style>
         </div>
     );

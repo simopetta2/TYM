@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, Navigate } from 'react-router-dom';
 import { Navbar, Nav, Container, Button, Offcanvas, Image, Dropdown, Badge } from 'react-bootstrap';
-import { List, House, Person, BoxArrowRight, Grid, People, CalendarWeek } from 'react-bootstrap-icons';
+import { List, House, Person, BoxArrowRight, Grid, People, CalendarWeek, EnvelopePaper, CardChecklist } from 'react-bootstrap-icons';
 import LogoTYM from './assets/logoTym';
 
 import Home from './Pages/Home';
@@ -16,10 +16,18 @@ import AdminPanel from './Pages/admin/AdminPanel';
 import MyFooter from './Components/MyFooter';
 import TrainingSchedules from './Pages/TrainingSchedules';
 import UserProfile from './Pages/UserProfile';
+import Contact from './Pages/Contact';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const token = localStorage.getItem('token');
   const userData = localStorage.getItem('user_data');
+
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 992);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   let user = null;
   if (userData && userData !== "undefined") {
@@ -35,6 +43,7 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
 };
 
 function NavigationBar() {
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 992);
   const [show, setShow] = useState(false);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
@@ -73,91 +82,101 @@ function NavigationBar() {
   return (
     <>
       <Navbar className="navbar sticky-top mb-4 bg-white shadow-sm">
-        <Container>
-          <Button variant="link" className="text-dark p-0 me-3" onClick={handleShow}>
-            <List size={32} />
-          </Button>
+        <Container className="d-flex justify-content-between align-items-center">
 
-          <Navbar.Brand as={Link} to="/" className="d-flex align-items-center gap-2 me-auto">
+
+          <Navbar.Brand as={Link} to="/" className="d-flex align-items-center gap-2 order-1">
             <LogoTYM size={40} />
             <span className="fw-bold text-dark fs-3 d-none d-sm-block">Train Your Movement</span>
           </Navbar.Brand>
 
-          <Nav className="ms-auto align-items-center">
+
+          <div className="d-flex align-items-center order-2">
+
+
             {token && user ? (
               <Dropdown align="end">
-                <Dropdown.Toggle variant="link" id="dropdown-user" className="p-0 border-0 no-caret">
+                <Dropdown.Toggle variant="link" id="dropdown-user" className="p-0 border-0 no-caret ">
                   <Image
                     src={user.avatar}
                     roundedCircle
                     style={{ width: '45px', height: '45px', objectFit: 'cover', border: '2px solid #e5383b' }}
                   />
                 </Dropdown.Toggle>
-                <Dropdown.Menu className="shadow border-0 mt-2">
+                <Dropdown.Menu className="shadow border-0 mt-2 order-1">
                   <Dropdown.Header className="fw-bold text-dark">{user.name} {user.surname}</Dropdown.Header>
                   <Dropdown.Divider />
-
-                  {/* VOCI COMUNI (User + Admin) */}
                   <Dropdown.Item as={Link} to="/profile"><Person className="me-2" /> Profilo</Dropdown.Item>
                   <Dropdown.Item as={Link} to="/dashboard"><Grid className="me-2" /> Dashboard</Dropdown.Item>
-                  <Dropdown.Item as={Link} to="/calendar"><CalendarWeek className="me-2" /> Calendario</Dropdown.Item>
 
-                  {/* VOCE EXTRA SOLO PER ADMIN */}
                   {user.role === 'admin' && (
                     <>
                       <Dropdown.Divider />
-                      <Dropdown.Item as={Link} to="/admin-panel" className="text-danger fw-bold">
+                      <Dropdown.Item as={Link} to="/admin-panel">
                         <People className="me-2" /> Gestione utenti
                       </Dropdown.Item>
+                      <Dropdown.Item as={Link} to="/schedules" >
+                        <CardChecklist className="me-2" /> Gestione schede
+                      </Dropdown.Item>
+                      <Dropdown.Item as={Link} to="/calendar"><CalendarWeek className="me-2" /> Calendario</Dropdown.Item>
                     </>
                   )}
-
                   <Dropdown.Divider />
                   <Dropdown.Item onClick={handleLogout} className="text-danger"><BoxArrowRight className="me-2" /> Logout</Dropdown.Item>
                 </Dropdown.Menu>
               </Dropdown>
             ) : (
-              <div className="d-flex gap-3">
-                <Nav.Link as={Link} to="/login" className="fw-bold text-dark d-none d-lg-block align-self-center">Accedi</Nav.Link>
-                <Button as={Link} to="/register" variant="dark" className="rounded-pill px-4">Inizia</Button>
-              </div>
+
+              <>
+
+
+                <Button variant="link" className="text-dark p-0 ms-2" onClick={handleShow}>
+                  <List size={32} />
+                </Button>
+              </>
             )}
-          </Nav>
+          </div>
+
         </Container>
       </Navbar>
 
-      <Offcanvas show={show} onHide={handleClose} placement="start">
+
+      <Offcanvas show={show} onHide={handleClose} placement="end">
         <Offcanvas.Header closeButton>
           <Offcanvas.Title>
-            {user ? <div className="d-flex align-items-center gap-2"><Image src={user.avatar} roundedCircle style={{ width: '40px', height: '40px', objectFit: 'cover' }} /><span className="fw-bold">{user.name}</span></div> : <LogoTYM size={50} />}
+            <LogoTYM size={50} />
           </Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
           <Nav className="flex-column gap-4">
-            <Nav.Link as={Link} to="/" onClick={handleClose} className="d-flex align-items-center gap-3 fs-5 text-dark fw-semibold"><House size={22} /> Home</Nav.Link>
-
-            {token && (
-              <>
-                {/* VOCI COMUNI */}
-                <Nav.Link as={Link} to="/profile" onClick={handleClose} className="d-flex align-items-center gap-3 fs-5 text-dark fw-semibold"><Person size={22} /> Profilo</Nav.Link>
-                <Nav.Link as={Link} to="/dashboard" onClick={handleClose} className="d-flex align-items-center gap-3 fs-5 text-dark fw-semibold"><Grid size={22} /> Dashboard</Nav.Link>
-                <Nav.Link as={Link} to="/calendar" onClick={handleClose} className="d-flex align-items-center gap-3 fs-5 text-dark fw-semibold"><CalendarWeek size={22} /> Calendario</Nav.Link>
-
-                {/* VOCE EXTRA SOLO PER ADMIN */}
-                {user?.role === 'admin' && (
-                  <Nav.Link as={Link} to="/admin-panel" onClick={handleClose} className="d-flex align-items-center gap-3 fs-5 text-danger fw-bold"><People size={22} /> Gestione Utenti</Nav.Link>
-                )}
-              </>
-            )}
-
+            <Nav.Link as={Link} to="/" onClick={handleClose} className="d-flex align-items-center gap-3 fs-5 text-dark fw-semibold">
+              <House size={22} /> Home
+            </Nav.Link>
+            <Nav.Link as={Link} to="/contact" onClick={handleClose} className="d-flex align-items-center gap-3 fs-5 text-dark fw-semibold">
+              <EnvelopePaper size={22} /> Contatti
+            </Nav.Link>
             <hr />
-            <Button variant={token ? "danger" : "dark"} className="w-100 rounded-pill" onClick={token ? handleLogout : () => { handleClose(); navigate('/login'); }}>
-              {token ? "Esci" : "Accedi"}
+            <Button variant="light" className="w-100 rounded-pill border-dark" onClick={() => { handleClose(); navigate('/login'); }}>
+              Accedi
+            </Button>
+            <Button variant="dark" className="w-100 rounded-pill" onClick={() => { handleClose(); navigate('/register'); }}>
+              Registrati +
             </Button>
           </Nav>
         </Offcanvas.Body>
       </Offcanvas>
+      <style>{`
+               .no-caret::after {
+               display: none !important;
+}
+                .dropdown-toggle.no-caret:focus,
+                .dropdown-toggle.no-caret:active {
+                box-shadow: none !important;
+                outline: none !important;
+}
+            `}</style>
     </>
+
   );
 }
 
@@ -173,14 +192,15 @@ export default function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/move" element={<MoveMethod />} />
             <Route path="/info-method" element={<InfoMethod />} />
+            <Route path="/contact" element={<Contact />} />
 
-            {/* Rotte protette comuni */}
+
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
             <Route path="/schedules" element={<ProtectedRoute><TrainingSchedules /></ProtectedRoute>} />
 
-            {/* Rotte solo Admin */}
+
             <Route path="/admin-panel" element={<ProtectedRoute adminOnly={true}><AdminPanel /></ProtectedRoute>} />
             <Route path="/userprofile/:id" element={<ProtectedRoute adminOnly={true}><UserProfile /></ProtectedRoute>} />
 
@@ -190,5 +210,6 @@ export default function App() {
         <MyFooter />
       </div>
     </Router>
+
   );
 }
