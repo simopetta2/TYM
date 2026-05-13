@@ -44,7 +44,7 @@ router.post("/", cloudinaryUploader.single("avatar"), async (req, res) => {
             email,
             password,
             birthDate,
-            avatar: req.file ? req.file.path : `https://ui-avatars.com/api/?name=${name}+${surname}`,
+            avatar: req.file ? req.file.path : `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}+${encodeURIComponent(surname)}&background=random&color=fff`,
 
         });
 

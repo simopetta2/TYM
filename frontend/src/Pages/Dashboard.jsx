@@ -53,8 +53,12 @@ const Dashboard = () => {
                 </div>
 
                 {/* Se l'utente è admin, mostriamo un pulsante speciale */}
-                {user?.role === 'admin' && (
+                {user?.role === 'admin' ? (
                     <Button variant="outline-danger" onClick={() => navigate('/profile')}>
+                        Profilo
+                    </Button>
+                ) : (
+                    <Button variant="outline-dark" onClick={() => navigate('/profile')}>
                         Profilo
                     </Button>
                 )}
@@ -105,7 +109,7 @@ const Dashboard = () => {
                 <Row className="w-100 m-0">
                     {/* Prima Card */}
                     <Col md={6} className="px-0">
-                        <Card className="border-0 rounded-5 p-4 mt-4 shadow-sm text-center bg-light">
+                        <Card className="border-0 rounded-5 p-4 mt-4 shadow-sm text-center bg-light border-bottom border-danger border-4">
                             <Card.Img
                                 variant="top"
                                 src='src/assets/calendar.jpg'
@@ -123,10 +127,10 @@ const Dashboard = () => {
 
                     {/* Seconda Card */}
                     <Col md={6} className="px-0">
-                        <Card className="border-0 rounded-5 p-4 mt-4 shadow-sm text-center bg-light">
+                        <Card className="border-0 rounded-5 p-4 mt-4 shadow-sm text-center bg-light border-bottom border-danger border-4">
                             <Card.Img
                                 variant="top"
-                                src='src/assets/calendar.jpg'
+                                src='src/assets/schedule.png'
                                 style={{ objectFit: 'cover', height: '200px' }}
                             />
                             <Card.Body>
@@ -143,7 +147,7 @@ const Dashboard = () => {
                 <Row className="w-100 m-0">
                     {/* Prima Card */}
                     <Col md={6} className="px-0">
-                        <Card className="border-0 rounded-5 p-4 mt-4 shadow-sm text-center bg-light">
+                        <Card className="border-0 rounded-5 p-4 mt-4 shadow-sm text-center bg-light border-bottom border-dark border-4">
                             <Card.Img
                                 variant="top"
                                 src='src/assets/calendar.jpg'
@@ -161,10 +165,10 @@ const Dashboard = () => {
 
                     {/* Seconda Card */}
                     <Col md={6} className="px-0">
-                        <Card className="border-0 rounded-5 p-4 mt-4 shadow-sm text-center bg-light">
+                        <Card className="border-0 rounded-5 p-4 mt-4 shadow-sm text-center bg-light border-bottom border-dark border-4">
                             <Card.Img
                                 variant="top"
-                                src='src/assets/calendar.jpg'
+                                src='src/assets/schedule.png'
                                 style={{ objectFit: 'cover', height: '200px' }}
                             />
                             <Card.Body>
@@ -181,16 +185,23 @@ const Dashboard = () => {
             }
 
             {/* Azioni Condizionali */}
-            <Row className="mt-5">
-                <Col>
-                    <Card className="border-0 rounded-5 p-5 shadow-sm text-center bg-light">
+            <Row className="mt-3">
+                <Col md={6} className="px-0">
+                    <Card className="border-0 rounded-5 p-4 mt-4 shadow-sm text-center bg-light border-bottom border-danger border-4">
                         {user?.role === 'admin' ? (
                             <>
-                                <h3 className="fw-bold text-danger">Pannello di Controllo</h3>
-                                <p className="mb-4">Come amministratore puoi gestire le schede e gli utenti del sistema.</p>
-                                <Button variant="danger" size="lg" className="rounded-pill px-5" onClick={() => navigate('/admin-panel')}>
-                                    Visualizza tutti gli utenti
-                                </Button>
+                                <Card.Img
+                                    variant="top"
+                                    src='src/assets/users.png'
+                                    style={{ objectFit: 'cover', height: '200px' }}
+                                />
+                                <Card.Body>
+                                    <Card.Title>Gestione Utenti</Card.Title>
+                                    <Card.Text>
+                                        Gestisci tutti gli utenti
+                                    </Card.Text>
+                                    <Button onClick={() => navigate('/admin-panel')} variant="dark" className='w-100'>Vai</Button>
+                                </Card.Body>
                             </>
                         ) : (
                             <>

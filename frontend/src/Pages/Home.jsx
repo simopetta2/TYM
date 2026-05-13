@@ -24,9 +24,7 @@ const Home = () => {
                         <Button as={Link} to="/move" className="btn-main btn-danger">
                             ENTRA NEL METODO M.O.V.E.
                         </Button>
-                        <Button variant="link" className="btn-secondary-custom">
-                            Guarda i risultati →
-                        </Button>
+
                     </div>
                 </Container>
             </section>

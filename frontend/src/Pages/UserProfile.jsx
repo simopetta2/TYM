@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Row, Col, Card, Form, Button, Badge, Spinner, Alert, Stack, InputGroup } from 'react-bootstrap';
-import { ArrowLeft, PencilSquare, Save, Trophy } from 'react-bootstrap-icons';
+import { Container, Row, Col, Card, Form, Button, Badge, Spinner, Alert, Stack, InputGroup, Modal } from 'react-bootstrap';
+import { ArrowLeft, PencilSquare, Save, Trophy, Trash } from 'react-bootstrap-icons';
 import { useParams, useNavigate } from 'react-router-dom';
 import { apiRequest } from '../Services/api';
 
@@ -13,13 +13,10 @@ const UserProfile = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [message, setMessage] = useState(null);
 
+    const [showModal, setShowModal] = useState(false);
+
     const [formData, setFormData] = useState({
-        name: '',
-        surname: '',
-        email: '',
-        bio: '',
-        weight: '',
-        height: ''
+        name: '', surname: '', email: '', bio: '', weight: '', height: ''
     });
 
     useEffect(() => {
@@ -60,6 +57,17 @@ const UserProfile = () => {
         }
     };
 
+    const handleDelete = async () => {
+        try {
+            await apiRequest(`/user/${id}`, { method: 'DELETE' });
+            setShowModal(false);
+            navigate(-1);
+        } catch (error) {
+            setMessage({ type: 'danger', text: "Errore durante l'eliminazione." });
+            setShowModal(false);
+        }
+    };
+
     if (loading) return (
         <Container className="d-flex justify-content-center align-items-center" style={{ height: '80vh' }}>
             <Spinner animation="border" variant="danger" />
@@ -69,13 +77,34 @@ const UserProfile = () => {
     return (
         <div className="profile-page" style={{ backgroundColor: '#fdfdfd', minHeight: '100vh', padding: '40px 0' }}>
             <Container>
-                {/* BACK BUTTON */}
+
+                <Modal show={showModal} onHide={() => setShowModal(false)} centered border="0">
+                    <Modal.Body className="text-center p-5">
+                        <div className="mb-4">
+                            <Trash size={50} className="text-danger" />
+                        </div>
+                        <h3 className="fw-bold">Sei sicuro?</h3>
+                        <p className="text-muted">
+                            L'eliminazione dell'atleta <strong>{user?.name} {user?.surname}</strong> è permanente e non può essere annullata.
+                        </p>
+                        <Stack gap={2} className="mt-4">
+                            <Button variant="danger" className="rounded-pill fw-bold py-2" onClick={handleDelete}>
+                                ELIMINA DEFINITIVAMENTE
+                            </Button>
+                            <Button variant="light" className="rounded-pill fw-bold py-2" onClick={() => setShowModal(false)}>
+                                ANNULLA
+                            </Button>
+                        </Stack>
+                    </Modal.Body>
+                </Modal>
+
+
                 <Button
                     variant="link"
                     className="text-dark p-0 mb-4 text-decoration-none d-flex align-items-center gap-2 fw-bold"
-                    onClick={() => navigate('/admin-panel')}
+                    onClick={() => navigate(-1)}
                 >
-                    <ArrowLeft /> TORNA ALLA LISTA UTENTI
+                    <ArrowLeft /> TORNA INDIETRO
                 </Button>
 
                 {/* HEADER */}
@@ -83,9 +112,9 @@ const UserProfile = () => {
                     <img src={user?.avatar} alt="avatar" style={{ width: '140px', height: '140px', borderRadius: '50%', border: '4px solid #212529', objectFit: 'cover' }} />
                     <div className="text-center text-md-start">
                         <h1 className="fw-black text-dark m-0" style={{ fontSize: '3rem', fontWeight: 900 }}>
-                            {user?.name.toUpperCase()} <span style={{ color: '#e5383b' }}>{user?.surname.toUpperCase()}</span>
+                            {user?.name?.toUpperCase()} <span style={{ color: '#e5383b' }}>{user?.surname?.toUpperCase()}</span>
                         </h1>
-                        <Badge bg="danger" className="mt-2 text-uppercase fw-bold">Atleta ID: {id.slice(-6)}</Badge>
+                        <Badge bg="danger" className="mt-2 text-uppercase fw-bold">Atleta ID: {id?.slice(-6)}</Badge>
                     </div>
                 </div>
 
@@ -120,19 +149,11 @@ const UserProfile = () => {
                                         </Form.Group>
                                     </Col>
 
-                                    {/* SEZIONE PESO E ALTEZZA */}
                                     <Col md={6} className="mt-4">
                                         <Form.Group>
                                             <Form.Label className="small fw-bold text-danger">PESO ATTUALE</Form.Label>
                                             <InputGroup>
-                                                <Form.Control
-                                                    type="number"
-                                                    step="0.1"
-                                                    className="bg-light border-0 p-3 shadow-none"
-                                                    value={formData.weight}
-                                                    readOnly={!isEditing}
-                                                    onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
-                                                />
+                                                <Form.Control type="number" step="0.1" className="bg-light border-0 p-3 shadow-none" value={formData.weight} readOnly={!isEditing} onChange={(e) => setFormData({ ...formData, weight: e.target.value })} />
                                                 <InputGroup.Text className="bg-light border-0 fw-bold">kg</InputGroup.Text>
                                             </InputGroup>
                                         </Form.Group>
@@ -141,13 +162,7 @@ const UserProfile = () => {
                                         <Form.Group>
                                             <Form.Label className="small fw-bold text-danger">ALTEZZA</Form.Label>
                                             <InputGroup>
-                                                <Form.Control
-                                                    type="number"
-                                                    className="bg-light border-0 p-3 shadow-none"
-                                                    value={formData.height}
-                                                    readOnly={!isEditing}
-                                                    onChange={(e) => setFormData({ ...formData, height: e.target.value })}
-                                                />
+                                                <Form.Control type="number" className="bg-light border-0 p-3 shadow-none" value={formData.height} readOnly={!isEditing} onChange={(e) => setFormData({ ...formData, height: e.target.value })} />
                                                 <InputGroup.Text className="bg-light border-0 fw-bold">cm</InputGroup.Text>
                                             </InputGroup>
                                         </Form.Group>
@@ -171,7 +186,6 @@ const UserProfile = () => {
 
                         <Col lg={4}>
                             <Stack gap={4}>
-                                {/* CARD RIASSUNTIVA DATI FISICI */}
                                 <Card className="border-0 shadow-lg rounded-4 p-4 bg-dark text-white text-center">
                                     <Trophy size={30} className="mb-3 text-danger" />
                                     <h6 className="text-uppercase fw-bold opacity-75 small mb-4">Parametri Fisici</h6>
@@ -187,11 +201,17 @@ const UserProfile = () => {
                                     </Row>
                                 </Card>
 
-                                {/* CARD INFO AGGIUNTIVE */}
                                 <Card className="border-0 shadow-sm rounded-4 p-4 bg-white">
                                     <h6 className="fw-bold mb-3 text-uppercase small">Info Account</h6>
                                     <p className="small mb-2 text-muted">Email: <span className="text-dark fw-bold">{formData.email}</span></p>
                                     <p className="small mb-0 text-muted">Ruolo: <span className="text-dark fw-bold">{user?.role === 'admin' ? 'Admin' : 'Atleta'}</span></p>
+                                </Card>
+
+                                <Card className="border-0 shadow-sm rounded-4 p-4" style={{ backgroundColor: 'rgba(229, 56, 59, 0.05)' }}>
+
+                                    <Button onClick={() => setShowModal(true)} variant="outline-danger" size="sm" className="rounded-pill fw-bold border-0 bg-white shadow-sm">
+                                        Elimina Account
+                                    </Button>
                                 </Card>
                             </Stack>
                         </Col>

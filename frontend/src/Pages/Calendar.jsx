@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Card, Spinner, Modal, Button, Form } from 'react-bootstrap';
-import { Trash, CalendarPlus, InfoCircle, Person } from 'react-bootstrap-icons';
+import { Trash, CalendarPlus, InfoCircle, Person, ArrowLeft } from 'react-bootstrap-icons';
 import FullCalendar from '@fullcalendar/react';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import { apiRequest } from '../Services/api';
+import { useNavigate } from 'react-router-dom';
 
 const Calendar = () => {
+    const navigate = useNavigate()
     const [events, setEvents] = useState([]);
     const [users, setUsers] = useState([]);
     const [user, setUser] = useState(null);
@@ -124,6 +126,13 @@ const Calendar = () => {
     return (
         <div className="calendar-main-container" style={{ backgroundColor: '#fdfdfd', minHeight: '100vh', padding: '40px 0' }}>
             <Container>
+                <Button
+                    variant="link"
+                    className="text-dark p-0 mb-5 text-decoration-none d-flex align-items-center gap-2 fw-bold"
+                    onClick={() => navigate(-1)}
+                >
+                    <ArrowLeft /> TORNA INDIETRO
+                </Button>
                 {/* Header Moderno */}
                 <div className="d-flex justify-content-between align-items-center mb-5">
                     <div>

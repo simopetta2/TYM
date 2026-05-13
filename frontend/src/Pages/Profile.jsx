@@ -174,25 +174,27 @@ const Profile = () => {
 
                             <Card className="border-0 shadow-sm rounded-4 p-4 bg-white">
                                 <h5 className="fw-bold mb-4 d-flex align-items-center gap-2">
-                                    <ShieldLock className="text-danger" /> Sicurezza
+                                    <ShieldLock className="text-danger" />Naviga
                                 </h5>
                                 <div className="d-grid gap-2">
                                     <Button onClick={() => navigate('/dashboard')} variant="light" className="text-start p-3 rounded-3 border-0 fw-bold small text-muted">
                                         Dashboard
                                     </Button>
-                                    <Button onClick={() => navigate('/dashboard')} variant="light" className="text-start p-3 rounded-3 border-0 fw-bold small text-muted">
-                                        Autenticazione 2FA
-                                    </Button>
+                                    {user?.role === 'admin' ? (
+
+                                        <Button onClick={() => navigate('/admin-panel')} variant="light" className="text-start p-3 rounded-3 border-0 fw-bold small text-muted">
+                                            Gestione utenti
+                                        </Button>
+                                    ) : (
+                                        <Button onClick={() => navigate('/calendar')} variant="light" className="text-start p-3 rounded-3 border-0 fw-bold small text-muted">
+                                            Calendario
+                                        </Button>
+                                    )}
                                 </div>
                             </Card>
 
 
-                            <Card className="border-0 shadow-sm rounded-4 p-4" style={{ backgroundColor: 'rgba(229, 56, 59, 0.05)' }}>
-                                <h5 className="fw-bold text-danger mb-3 text-uppercase small">Danger Zone</h5>
-                                <Button variant="outline-danger" size="sm" className="rounded-pill fw-bold border-0 bg-white">
-                                    Elimina Account
-                                </Button>
-                            </Card>
+
                         </div>
                     </Col>
                 </Row>

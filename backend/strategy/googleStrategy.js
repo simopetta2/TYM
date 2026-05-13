@@ -19,10 +19,10 @@ const googleStrategy = new GoogleStrategy({
 
         if (!user) {
             user = new User({
-                name: name.givenName,
-                surname: name.familyName,
+                name: name.givenName || name.displayName,
+                surname: name.familyName || ' ',
                 email: email,
-                avatar: photos[0].value,
+                avatar: photos[0].value
             });
             await user.save();
         }

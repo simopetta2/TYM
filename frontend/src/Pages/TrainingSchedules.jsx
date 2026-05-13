@@ -8,11 +8,14 @@ import {
     Trash3,
     Calendar3,
     CloudArrowUp,
-    InfoCircle
+    InfoCircle,
+    ArrowLeft
 } from 'react-bootstrap-icons';
 import { apiRequest } from '../Services/api';
+import { useNavigate } from 'react-router-dom';
 
 const TrainingSchedules = () => {
+    const navigate = useNavigate()
 
     const [schedules, setSchedules] = useState([]);
     const [users, setUsers] = useState([]);
@@ -130,7 +133,13 @@ const TrainingSchedules = () => {
     return (
         <div className="training-page" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh', padding: '60px 0' }}>
             <Container>
-
+                <Button
+                    variant="link"
+                    className="text-dark p-0 mb-5 text-decoration-none d-flex align-items-center gap-2 fw-bold"
+                    onClick={() => navigate(-1)}
+                >
+                    <ArrowLeft /> TORNA INDIETRO
+                </Button>
                 <div className="mb-5 text-center text-md-start">
                     <h6 className="text-danger fw-bold text-uppercase mb-2" style={{ letterSpacing: '3px' }}>Performance Archive</h6>
                     <h1 className="fw-black text-dark display-4 mb-0" style={{ letterSpacing: '-2px' }}>

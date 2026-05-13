@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, Navigate } from 'react-router-dom';
-import { Navbar, Nav, Container, Button, Offcanvas, Image, Dropdown } from 'react-bootstrap';
-import { List, House, Person, BoxArrowRight, PersonPlus, Grid } from 'react-bootstrap-icons';
+import { Navbar, Nav, Container, Button, Offcanvas, Image, Dropdown, Badge } from 'react-bootstrap';
+import { List, House, Person, BoxArrowRight, Grid, People, CalendarWeek } from 'react-bootstrap-icons';
 import LogoTYM from './assets/logoTym';
 
 import Home from './Pages/Home';
@@ -11,15 +11,15 @@ import Calendar from './Pages/Calendar';
 import Register from './Pages/Register';
 import Dashboard from './Pages/Dashboard';
 import MoveMethod from './Pages/MoveMethod';
+import InfoMethod from './Pages/InfoMethod';
 import AdminPanel from './Pages/admin/AdminPanel';
 import MyFooter from './Components/MyFooter';
 import TrainingSchedules from './Pages/TrainingSchedules';
-import UserProfile from './Pages/UserProfile'
+import UserProfile from './Pages/UserProfile';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const token = localStorage.getItem('token');
   const userData = localStorage.getItem('user_data');
-
 
   let user = null;
   if (userData && userData !== "undefined") {
@@ -74,7 +74,6 @@ function NavigationBar() {
     <>
       <Navbar className="navbar sticky-top mb-4 bg-white shadow-sm">
         <Container>
-          {/* Menu a sinistra come prima */}
           <Button variant="link" className="text-dark p-0 me-3" onClick={handleShow}>
             <List size={32} />
           </Button>
@@ -97,8 +96,22 @@ function NavigationBar() {
                 <Dropdown.Menu className="shadow border-0 mt-2">
                   <Dropdown.Header className="fw-bold text-dark">{user.name} {user.surname}</Dropdown.Header>
                   <Dropdown.Divider />
+
+                  {/* VOCI COMUNI (User + Admin) */}
                   <Dropdown.Item as={Link} to="/profile"><Person className="me-2" /> Profilo</Dropdown.Item>
                   <Dropdown.Item as={Link} to="/dashboard"><Grid className="me-2" /> Dashboard</Dropdown.Item>
+                  <Dropdown.Item as={Link} to="/calendar"><CalendarWeek className="me-2" /> Calendario</Dropdown.Item>
+
+                  {/* VOCE EXTRA SOLO PER ADMIN */}
+                  {user.role === 'admin' && (
+                    <>
+                      <Dropdown.Divider />
+                      <Dropdown.Item as={Link} to="/admin-panel" className="text-danger fw-bold">
+                        <People className="me-2" /> Gestione utenti
+                      </Dropdown.Item>
+                    </>
+                  )}
+
                   <Dropdown.Divider />
                   <Dropdown.Item onClick={handleLogout} className="text-danger"><BoxArrowRight className="me-2" /> Logout</Dropdown.Item>
                 </Dropdown.Menu>
@@ -116,20 +129,29 @@ function NavigationBar() {
       <Offcanvas show={show} onHide={handleClose} placement="start">
         <Offcanvas.Header closeButton>
           <Offcanvas.Title>
-            {user ? <div className="d-flex align-items-center gap-2"><Image src={user.avatar} roundedCircle style={{ width: '40px' }} /><span className="fw-bold">{user.name}</span></div> : <LogoTYM size={50} />}
+            {user ? <div className="d-flex align-items-center gap-2"><Image src={user.avatar} roundedCircle style={{ width: '40px', height: '40px', objectFit: 'cover' }} /><span className="fw-bold">{user.name}</span></div> : <LogoTYM size={50} />}
           </Offcanvas.Title>
         </Offcanvas.Header>
         <Offcanvas.Body>
           <Nav className="flex-column gap-4">
             <Nav.Link as={Link} to="/" onClick={handleClose} className="d-flex align-items-center gap-3 fs-5 text-dark fw-semibold"><House size={22} /> Home</Nav.Link>
+
             {token && (
               <>
+                {/* VOCI COMUNI */}
                 <Nav.Link as={Link} to="/profile" onClick={handleClose} className="d-flex align-items-center gap-3 fs-5 text-dark fw-semibold"><Person size={22} /> Profilo</Nav.Link>
                 <Nav.Link as={Link} to="/dashboard" onClick={handleClose} className="d-flex align-items-center gap-3 fs-5 text-dark fw-semibold"><Grid size={22} /> Dashboard</Nav.Link>
+                <Nav.Link as={Link} to="/calendar" onClick={handleClose} className="d-flex align-items-center gap-3 fs-5 text-dark fw-semibold"><CalendarWeek size={22} /> Calendario</Nav.Link>
+
+                {/* VOCE EXTRA SOLO PER ADMIN */}
+                {user?.role === 'admin' && (
+                  <Nav.Link as={Link} to="/admin-panel" onClick={handleClose} className="d-flex align-items-center gap-3 fs-5 text-danger fw-bold"><People size={22} /> Gestione Utenti</Nav.Link>
+                )}
               </>
             )}
+
             <hr />
-            <Button variant={token ? "danger" : "dark"} className="w-100 rounded-pill" onClick={token ? handleLogout : () => navigate('/login')}>
+            <Button variant={token ? "danger" : "dark"} className="w-100 rounded-pill" onClick={token ? handleLogout : () => { handleClose(); navigate('/login'); }}>
               {token ? "Esci" : "Accedi"}
             </Button>
           </Nav>
@@ -148,14 +170,21 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/profile" element={<Profile />} />
             <Route path="/register" element={<Register />} />
             <Route path="/move" element={<MoveMethod />} />
-            <Route path="/userprofile/:id" element={<ProtectedRoute><UserProfile /></ProtectedRoute>} />
-            <Route path="/schedules" element={<ProtectedRoute><TrainingSchedules /></ProtectedRoute>} />
+            <Route path="/info-method" element={<InfoMethod />} />
+
+            {/* Rotte protette comuni */}
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/calendar" element={<ProtectedRoute><Calendar /></ProtectedRoute>} />
+            <Route path="/schedules" element={<ProtectedRoute><TrainingSchedules /></ProtectedRoute>} />
+
+            {/* Rotte solo Admin */}
             <Route path="/admin-panel" element={<ProtectedRoute adminOnly={true}><AdminPanel /></ProtectedRoute>} />
+            <Route path="/userprofile/:id" element={<ProtectedRoute adminOnly={true}><UserProfile /></ProtectedRoute>} />
+
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>
         <MyFooter />

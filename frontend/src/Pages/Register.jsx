@@ -42,6 +42,7 @@ const RegisterPage = () => {
                     <input name="password" type="password" placeholder="Password" onChange={e => setFormData({ ...formData, password: e.target.value })} style={styles.input} />
                     <input name="birthDate" type="date" onChange={e => setFormData({ ...formData, birthDate: e.target.value })} style={styles.input} />
                     <button type="submit" style={styles.button}>Crea Account</button>
+
                 </form>
                 <p style={styles.footer}>Hai un account? <span onClick={() => navigate('/login')} style={styles.link}>Login</span></p>
             </div>
