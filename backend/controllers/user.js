@@ -6,7 +6,7 @@ import User from '../models/User.js'
 export async function update(req, res) {
     try {
 
-        const id = req.params.id || req.user.id;
+        const id = req.params.id || (req.authUser ? req.authUser._id : null);
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({ message: 'Invalid user id' });
@@ -87,7 +87,7 @@ export async function findById(req, res) {
         const { id } = req.params
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({
-                message: 'invalid fgr id'
+                message: 'invalid user id'
             })
         }
         const user = await User.findById(req.params.id)
