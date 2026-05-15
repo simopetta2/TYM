@@ -1,16 +1,38 @@
-import React from 'react';
-import { Container, Row, Col, Form, Button, Card } from 'react-bootstrap';
-import { EnvelopePaper, Telephone, GeoAlt, SendCheck } from 'react-bootstrap-icons';
+import React, { useState } from 'react';
+import { Container, Row, Col, Form, Button, Card, Alert } from 'react-bootstrap';
+import { EnvelopePaper, Telephone, GeoAlt, SendCheck, CheckCircleFill } from 'react-bootstrap-icons';
 
 const Contact = () => {
+    // Stato per la visibilità del feedback
+    const [sent, setSent] = useState(false);
+
     const handleSubmit = (e) => {
         e.preventDefault();
-        window.location.reload()
-        alert("Messaggio inviato con successo!");
+
+        // Simulazione invio
+        setSent(true);
+
+        // Reset del form
+        e.target.reset();
+
+        // Nasconde il badge dopo 4 secondi
+        setTimeout(() => {
+            setSent(false);
+        }, 4000);
     };
 
     return (
-        <Container className="py-5" style={{ minHeight: '80vh' }}>
+        <Container className="py-5" style={{ minHeight: '80vh', position: 'relative' }}>
+
+            {/* BADGE DI CONFERMA ANIMATO */}
+            {sent && (
+                <div className="custom-badge-container">
+                    <Alert variant="success" className="d-flex align-items-center gap-3 shadow-lg border-0 rounded-pill px-4">
+                        <CheckCircleFill size={22} />
+                        <div className="fw-bold text-nowrap">Messaggio inviato con successo!</div>
+                    </Alert>
+                </div>
+            )}
 
             <Row className="mb-5 text-center">
                 <Col lg={8} className="mx-auto">
@@ -25,12 +47,10 @@ const Contact = () => {
             </Row>
 
             <Row className="gy-4">
-
+                {/* COLONNA INFO */}
                 <Col lg={4}>
                     <div className="d-flex flex-column gap-4">
-
-
-                        <Card className="border-0 shadow-sm rounded-4 p-3">
+                        <Card className="border-0 shadow-sm rounded-4 p-3 info-card">
                             <Card.Body className="d-flex align-items-center gap-3">
                                 <div className="bg-light p-3 rounded-circle text-danger">
                                     <Telephone size={24} />
@@ -42,8 +62,7 @@ const Contact = () => {
                             </Card.Body>
                         </Card>
 
-
-                        <Card className="border-0 shadow-sm rounded-4 p-3">
+                        <Card className="border-0 shadow-sm rounded-4 p-3 info-card">
                             <Card.Body className="d-flex align-items-center gap-3">
                                 <div className="bg-light p-3 rounded-circle text-danger">
                                     <EnvelopePaper size={24} />
@@ -55,8 +74,7 @@ const Contact = () => {
                             </Card.Body>
                         </Card>
 
-
-                        <Card className="border-0 shadow-sm rounded-4 p-3">
+                        <Card className="border-0 shadow-sm rounded-4 p-3 info-card">
                             <Card.Body className="d-flex align-items-center gap-3">
                                 <div className="bg-light p-3 rounded-circle text-danger">
                                     <GeoAlt size={24} />
@@ -67,11 +85,10 @@ const Contact = () => {
                                 </div>
                             </Card.Body>
                         </Card>
-
                     </div>
                 </Col>
 
-
+                {/* COLONNA FORM */}
                 <Col lg={8}>
                     <Card className="border-0 shadow-lg rounded-4 p-4 p-md-5">
                         <Form onSubmit={handleSubmit}>
@@ -137,22 +154,45 @@ const Contact = () => {
                 </Col>
             </Row>
 
-
-
             <style>{`
-        .fw-black { font-weight: 900; }
-        .form-input:focus {
-          background-color: #fff !important;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important;
-          border: 1px solid #e5383b !important;
-        }
-        .card {
-            transition: all 0.3s ease;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-        }
-      `}</style>
+                .fw-black { font-weight: 900; }
+                
+                .form-input:focus {
+                    background-color: #fff !important;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.05) !important;
+                    border: 1px solid #e5383b !important;
+                    outline: none;
+                }
+
+                .info-card {
+                    transition: all 0.3s ease;
+                }
+
+                .info-card:hover {
+                    transform: translateY(-5px);
+                }
+
+                /* Stile del Badge Animato */
+                .custom-badge-container {
+                    position: fixed;
+                    top: 20px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    z-index: 9999;
+                    animation: fadeInDown 0.5s ease;
+                }
+
+                @keyframes fadeInDown {
+                    from {
+                        opacity: 0;
+                        transform: translate(-50%, -20px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translate(-50%, 0);
+                    }
+                }
+            `}</style>
         </Container>
     );
 };
