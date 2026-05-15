@@ -17,6 +17,7 @@ import MyFooter from './Components/MyFooter';
 import TrainingSchedules from './Pages/TrainingSchedules';
 import UserProfile from './Pages/UserProfile';
 import Contact from './Pages/Contact';
+import ScrollToTop from './Components/scrollToTop';
 
 const ProtectedRoute = ({ children, adminOnly = false }) => {
   const token = localStorage.getItem('token');
@@ -186,6 +187,7 @@ export default function App() {
       <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
         <NavigationBar />
         <main style={{ flex: 1 }}>
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
